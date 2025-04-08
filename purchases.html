@@ -2,31 +2,45 @@
 <html>
 <head>
   <title>Buy/Sell Stocks</title>
+  <link rel="stylesheet" href="styles.css">
   <script src="Scripts/purchases.js" defer></script>
 </head>
 <body>
-  <h1>Buy/Sell Stocks</h1>
-
-  <label for="stockSelect">Select Stock:</label>
-  <select id="stockSelect">
-    <option value="NovaTech">NovaTech</option>
-    <option value="AgriGrow">AgriGrow</option>
-    <option value="Zephyr Auto">Zephyr Auto</option>
-    <option value="QuickMart">QuickMart</option>
-    <option value="NeoBank">NeoBank</option>
-    <option value="SolarEdge">SolarEdge</option>
-  </select>
-  <br><br>
-
-  <label for="price">Price:</label>
-  <input type="number" id="price" placeholder="Enter price">
-  <br><br>
-
-  <label for="quantity">Quantity:</label>
-  <input type="number" id="quantity" placeholder="Enter quantity">
-  <br><br>
-
-  <button onclick="buyStock()">Buy</button>
-  <button onclick="sellStock()">Sell</button>
-</body>
+    <div class="container">
+      <h1>Buy/Sell Stocks</h1>
+  
+      <label for="stockSelect">Select Stock:</label>
+      <select id="stockSelect">
+        <option value="Apple">Apple</option>
+        <option value="Nike">Nike</option>
+        <option value="Amazon">Amazon</option>
+        <option value="O&G">O&G</option>
+        <option value="Lulu">Lulu</option>
+        <option value="Salik">Salik</option>
+      </select>
+      <br><br>
+  
+      <label for="price">Price:</label>
+      <input type="number" id="price" placeholder="Enter price">
+      <br><br>
+  
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" placeholder="Enter quantity">
+      <br><br>
+  
+      <button onclick="buyStock()">Buy</button>
+      <button onclick="sellStock()">Sell</button>
+  
+      <br><br>
+      <button onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+  
+    <!-- Modal -->
+    <div id="popupModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closePopup()">&times;</span>
+        <p id="popupMessage"></p>
+      </div>
+    </div>
+  </body>
 </html>

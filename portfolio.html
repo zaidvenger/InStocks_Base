@@ -2,27 +2,31 @@
 <html>
 <head>
   <title>Portfolio</title>
+  <link rel="stylesheet" href="styles.css">
   <script src="Scripts/portfolio.js" defer></script>
 </head>
 <body>
-  <h1>Portfolio</h1>
-
-  <h2>Bought Stocks</h2>
-  <table border="1" id="boughtTable">
-    <tr>
-      <th>Stock Name</th>
-      <th>Price Bought At</th>
-      <th>Quantity</th>
-    </tr>
-  </table>
-
-  <h2>Sold Stocks</h2>
-  <table border="1" id="soldTable">
-    <tr>
-      <th>Stock Name</th>
-      <th>Price Sold At</th>
-      <th>Quantity</th>
-    </tr>
-  </table>
-</body>
+    <div class="container">
+      <h1>Portfolio</h1>
+  
+      <h2>Bought Stocks</h2>
+      <table id="boughtTable">
+        <tr>
+          <th>Stock Name</th>
+          <th>Total Price</th>
+        </tr>
+      </table>
+  
+      <h2>Sold Stocks</h2>
+      <table id="soldTable">
+        <tr>
+          <th>Stock Name</th>
+          <th>Total Price</th>
+        </tr>
+      </table>
+  
+      <br>
+      <button onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+  </body>
 </html>

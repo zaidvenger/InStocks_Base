@@ -7,12 +7,12 @@ window.onload = function () {
   
     bought.forEach(({ stock, price, quantity }) => {
       const row = boughtTable.insertRow();
-      row.innerHTML = `<td>${stock}</td><td>${price}</td><td>${quantity}</td>`;
+      row.innerHTML = `<td>${stock}</td><td>${price*quantity}</td>`;
     });
   
     sold.forEach(({ stock, price, quantity }) => {
       const row = soldTable.insertRow();
-      row.innerHTML = `<td>${stock}</td><td>${price}</td><td>${quantity}</td>`;
+      row.innerHTML = `<td>${stock}</td><td>${price*quantity}</td>`;
     });
   };
   
