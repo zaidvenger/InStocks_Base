@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Buy/Sell Stocks</title>
+</head>
+<body>
+  <h1>Buy/Sell Stocks</h1>
+
+  <label for="stockSelect">Select Stock:</label>
+  <select id="stockSelect">
+    <option value="NovaTech">NovaTech</option>
+    <option value="AgriGrow">AgriGrow</option>
+    <option value="Zephyr Auto">Zephyr Auto</option>
+    <option value="QuickMart">QuickMart</option>
+    <option value="NeoBank">NeoBank</option>
+    <option value="SolarEdge">SolarEdge</option>
+  </select>
+  <br><br>
+
+  <label for="price">Price:</label>
+  <input type="number" id="price" placeholder="Enter price">
+  <br><br>
+
+  <label for="quantity">Quantity:</label>
+  <input type="number" id="quantity" placeholder="Enter quantity">
+  <br><br>
+
+  <button onclick="buyStock()">Buy</button>
+  <button onclick="sellStock()">Sell</button>
+
+  <script>
+    function buyStock() {
+      const stock = document.getElementById('stockSelect').value;
+      const price = document.getElementById('price').value;
+      const quantity = document.getElementById('quantity').value;
+      alert(`Buying ${quantity} shares of ${stock} at ₹${price}`);
+    }
+
+    function sellStock() {
+      const stock = document.getElementById('stockSelect').value;
+      const price = document.getElementById('price').value;
+      const quantity = document.getElementById('quantity').value;
+      alert(`Selling ${quantity} shares of ${stock} at ₹${price}`);
+    }
+  </script>
+</body>
+</html>
