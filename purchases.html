@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Buy/Sell Stocks</title>
+  <script src="Scripts/purchases.js" defer></script>
 </head>
 <body>
   <h1>Buy/Sell Stocks</h1>
@@ -27,21 +28,5 @@
 
   <button onclick="buyStock()">Buy</button>
   <button onclick="sellStock()">Sell</button>
-
-  <script>
-    function buyStock() {
-      const stock = document.getElementById('stockSelect').value;
-      const price = document.getElementById('price').value;
-      const quantity = document.getElementById('quantity').value;
-      alert(`Buying ${quantity} shares of ${stock} at ₹${price}`);
-    }
-
-    function sellStock() {
-      const stock = document.getElementById('stockSelect').value;
-      const price = document.getElementById('price').value;
-      const quantity = document.getElementById('quantity').value;
-      alert(`Selling ${quantity} shares of ${stock} at ₹${price}`);
-    }
-  </script>
 </body>
 </html>
