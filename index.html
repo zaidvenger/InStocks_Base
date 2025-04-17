@@ -2,20 +2,62 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Stock Market Simulation</title>
+        <title>InStocks - Stock Market Simulation</title>
         <link rel="stylesheet" href="styles.css" />
         <script src="Scripts/utils.js" defer></script>
+        <script>
+            // Initialize page when loaded
+            window.onload = function() {
+                // Check if user is logged in
+                initPage();
+
+                // Check if user is admin to show/hide admin button
+                const currentUser = getUser();
+                if (currentUser) {
+                    const authData = JSON.parse(localStorage.getItem(`${currentUser}_auth`));
+                    const adminButton = document.getElementById("adminButton");
+
+                    if (!authData || !authData.isAdmin) {
+                        adminButton.style.display = "none";
+                    }
+                }
+            };
+        </script>
     </head>
     <body>
         <div class="container">
-            <h1>Welcome to the Stock Market Simulation</h1>
+            <h1>Welcome to InStocks</h1>
             <div id="userInfo"></div>
-            <div class="button-group">
-                <button onclick="window.location.href='portfolio.html'">View Portfolio</button>
-                <button onclick="window.location.href='purchases.html'">Buy/Sell Stocks</button>
-                <button onclick="window.location.href='leaderboard.html'">Leaderboard</button>
-                <button onclick="window.location.href='admin.html'">Admin</button>
-                <button onclick="logout()">Logout</button>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Navigation</div>
+                    <div class="card-description">Manage your stocks and view market data</div>
+                </div>
+                <div class="card-content">
+                    <div class="button-group">
+                        <button onclick="window.location.href='portfolio.html'">View Portfolio</button>
+                        <button onclick="window.location.href='purchases.html'">Buy/Sell Stocks</button>
+                        <button onclick="window.location.href='leaderboard.html'">Leaderboard</button>
+                        <button id="adminButton" onclick="window.location.href='admin.html'">Admin Panel</button>
+                        <button class="destructive" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">About InStocks</div>
+                </div>
+                <div class="card-content">
+                    <p>InStocks is a stock market simulation platform where you can:</p>
+                    <ul>
+                        <li>Buy and sell virtual stocks</li>
+                        <li>Track your portfolio performance</li>
+                        <li>Compete with other traders on the leaderboard</li>
+                    </ul>
+                    <p>Each user starts with AED100,000 of virtual currency.</p>
+                </div>
             </div>
         </div>
     </body>

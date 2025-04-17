@@ -1,31 +1,68 @@
 // leaderboard.js
 
-window.onload = function () {
-    const currentUser = sessionStorage.getItem("currentUser");
-    if (!currentUser) {
-        window.location.href = "login.html";
-        return;
+// Load leaderboard data
+function loadLeaderboard() {
+    const table = document.getElementById("leaderboardTable");
+    const currentUserHighlight = document.getElementById("currentUserRank");
+    const users = [];
+    const currentUser = getUser();
+
+    // Clear existing table rows except header
+    while (table.rows.length > 1) {
+        table.deleteRow(1);
     }
 
-    document.getElementById("userInfo").innerText = `Logged in as: ${currentUser}`;
-    const table = document.getElementById("leaderboardTable");
-    const users = [];
-
+    // Get all user balances
     for (let i = 1; i <= 20; i++) {
         const userId = `user${i}`;
         const balance = calculateBalance(userId);
-        users.push({ userId, balance });
+        const userData = getUserData(userId);
+
+        // Calculate transaction count
+        const transactions = userData.bought.length + userData.sold.length;
+
+        users.push({ userId, balance, transactions });
     }
 
+    // Sort by balance (highest first)
     users.sort((a, b) => b.balance - a.balance);
 
-    users.forEach(({ userId, balance }) => {
-        const row = table.insertRow();
-        row.innerHTML = `<td>${userId}</td><td>AED${balance}</td>`;
-    });
-};
+    // Find current user's rank
+    const currentUserRank = users.findIndex(user => user.userId === currentUser) + 1;
 
-function logout() {
-    sessionStorage.removeItem("currentUser");
-    window.location.href = "login.html";
+    // Display users in table
+    users.forEach(({ userId, balance, transactions }, index) => {
+        const rank = index + 1;
+        const isCurrentUser = userId === currentUser;
+
+        const row = table.insertRow();
+
+        // Highlight current user
+        if (isCurrentUser) {
+            row.className = "current-user-row";
+        }
+
+        row.innerHTML = `
+            <td>${rank}</td>
+            <td>${userId}</td>
+            <td>${formatCurrency(balance)}</td>
+            <td>${transactions}</td>
+        `;
+    });
+
+    // Update current user rank display
+    if (currentUserRank > 0) {
+        currentUserHighlight.textContent = `Your current rank: ${currentUserRank} of 20`;
+    }
 }
+
+// Initialize page
+window.onload = function () {
+    // Check if user is logged in
+    if (!initPage()) {
+        return;
+    }
+
+    // Load leaderboard
+    loadLeaderboard();
+};

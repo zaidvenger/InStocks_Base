@@ -1,42 +1,131 @@
 // admin.js
-if (sessionStorage.getItem("currentUser") !== "admin1") {
-    alert("Access Denied");
-    window.location.href = "index.html";
-}
 
+// Check if user is admin on page load
 window.onload = function () {
-    const table = document.getElementById("adminTable");
-    const currentUser = sessionStorage.getItem("currentUser");
-    document.getElementById("userInfo").innerText = `Logged in as: ${currentUser}`;
+    // Check if user is logged in
+    if (!initPage()) {
+        return;
+    }
 
+    // Get current user
+    const currentUser = getUser();
+
+    // Check if user is admin
+    const authData = JSON.parse(localStorage.getItem(`${currentUser}_auth`));
+    if (!authData || !authData.isAdmin) {
+        alert("Access Denied. Admin privileges required.");
+        window.location.href = "index.html";
+        return;
+    }
+
+    // Load admin panel
+    loadAdminPanel();
+};
+
+// Load admin panel data
+function loadAdminPanel() {
+    const table = document.getElementById("adminTable");
+
+    // Clear existing table rows except header
+    while (table.rows.length > 1) {
+        table.deleteRow(1);
+    }
+
+    // Add user rows
     for (let i = 1; i <= 20; i++) {
         const userId = `user${i}`;
         const balance = calculateBalance(userId);
 
+        // Get user data to check activity
+        const userData = getUserData(userId);
+        const hasActivity = userData.bought.length > 0 || userData.sold.length > 0;
+
         const row = table.insertRow();
         row.innerHTML = `
-        <td>${userId}</td>
-        <td>AED${balance}</td>
-        <td><button onclick="resetUser('${userId}')">Reset</button></td>
-      `;
+            <td>${userId}</td>
+            <td>${formatCurrency(balance)}</td>
+            <td>${hasActivity ? userData.bought.length + userData.sold.length + ' transactions' : 'No activity'}</td>
+            <td>
+                <button class="secondary" onclick="resetUser('${userId}')">Reset</button>
+                <button class="secondary" onclick="viewUserDetails('${userId}')">View Details</button>
+            </td>
+        `;
     }
-};
+}
 
+// Reset a single user
 function resetUser(userId) {
-    sessionStorage.setItem(userId, JSON.stringify({ bought: [], sold: [] }));
-    alert(`Reset ${userId}`);
-    location.reload();
-}
-
-function resetAllUsers() {
-    for (let i = 1; i <= 20; i++) {
-        sessionStorage.setItem(`user${i}`, JSON.stringify({ bought: [], sold: [] }));
+    if (!confirmAction(`Are you sure you want to reset ${userId}? This will clear all their transactions.`)) {
+        return;
     }
-    alert("All users have been reset.");
-    location.reload();
+
+    // Reset user data
+    saveUserData(userId, { bought: [], sold: [] });
+
+    // Show success message
+    const message = document.getElementById("statusMessage");
+    message.textContent = `Reset ${userId} successfully.`;
+    message.className = "success-message";
+    message.style.display = "block";
+
+    // Hide message after 3 seconds
+    setTimeout(() => {
+        message.style.display = "none";
+    }, 3000);
+
+    // Reload admin panel
+    loadAdminPanel();
 }
 
-function logout() {
-    sessionStorage.removeItem("currentUser");
-    window.location.href = "login.html";
+// Reset all users
+function resetAllUsers() {
+    if (!confirmAction("Are you sure you want to reset ALL users? This will clear all transactions for all users.")) {
+        return;
+    }
+
+    // Reset all users
+    for (let i = 1; i <= 20; i++) {
+        const userId = `user${i}`;
+        saveUserData(userId, { bought: [], sold: [] });
+    }
+
+    // Show success message
+    const message = document.getElementById("statusMessage");
+    message.textContent = "All users have been reset successfully.";
+    message.className = "success-message";
+    message.style.display = "block";
+
+    // Hide message after 3 seconds
+    setTimeout(() => {
+        message.style.display = "none";
+    }, 3000);
+
+    // Reload admin panel
+    loadAdminPanel();
+}
+
+// View user details
+function viewUserDetails(userId) {
+    const userData = getUserData(userId);
+    const balance = calculateBalance(userId);
+
+    // Create modal content
+    let content = `
+        <h3>User Details: ${userId}</h3>
+        <p>Current Balance: ${formatCurrency(balance)}</p>
+        <h4>Transaction Summary:</h4>
+        <p>Purchases: ${userData.bought.length}</p>
+        <p>Sales: ${userData.sold.length}</p>
+    `;
+
+    // Show modal
+    const modal = document.getElementById("detailsModal");
+    const modalContent = document.getElementById("detailsContent");
+    modalContent.innerHTML = content;
+    modal.style.display = "block";
+}
+
+// Close modal
+function closeModal() {
+    document.getElementById("detailsModal").style.display = "none";
 }

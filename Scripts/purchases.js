@@ -1,89 +1,209 @@
 // purchases.js
 
+// Buy stock function with validation
 function buyStock() {
     const stock = document.getElementById("stockSelect").value;
     const price = parseFloat(document.getElementById("price").value);
     const quantity = parseInt(document.getElementById("quantity").value);
 
-    const currentUser = sessionStorage.getItem("currentUser");
+    // Get current user
+    const currentUser = getUser();
     if (!currentUser) {
         window.location.href = "login.html";
         return;
     }
 
-    const userData = JSON.parse(sessionStorage.getItem(currentUser)) || { bought: [], sold: [] };
-    userData.bought.push({ stock, price, quantity });
-    sessionStorage.setItem(currentUser, JSON.stringify(userData));
+    // Validate inputs
+    if (!validateTradeInputs(price, quantity)) {
+        return;
+    }
 
-    showPopup(`Successfully bought ${quantity} of ${stock} at AED${price}`);
+    // Calculate total cost
+    const totalCost = price * quantity;
+
+    // Check if user has enough balance
+    if (!canAffordPurchase(currentUser, totalCost)) {
+        showPopup(`Cannot buy stocks. Insufficient funds. You need ${formatCurrency(totalCost)}.`, 'error');
+        return;
+    }
+
+    // Confirm purchase
+    if (!confirmAction(`Are you sure you want to buy ${quantity} of ${stock} at ${formatCurrency(price)} each (total: ${formatCurrency(totalCost)})?`)) {
+        return;
+    }
+
+    // Get user data
+    const userData = getUserData(currentUser);
+
+    // Add transaction with timestamp
+    userData.bought.push({
+        stock,
+        price,
+        quantity,
+        date: new Date().toISOString(),
+        transactionId: generateTransactionId()
+    });
+
+    // Save user data
+    saveUserData(currentUser, userData);
+
+    // Show success message
+    showPopup(`Successfully bought ${quantity} of ${stock} at ${formatCurrency(price)} each (total: ${formatCurrency(totalCost)})`, 'success');
+
+    // Update balance display
+    updateBalanceDisplay();
 }
 
+// Sell stock function with validation
 function sellStock() {
     const stock = document.getElementById("stockSelect").value;
     const price = parseFloat(document.getElementById("price").value);
     const quantity = parseInt(document.getElementById("quantity").value);
     const toUser = document.getElementById("sellToUser").value;
 
-    const currentUser = sessionStorage.getItem("currentUser");
+    // Get current user
+    const currentUser = getUser();
     if (!currentUser) {
         window.location.href = "login.html";
         return;
     }
 
-    const sellerData = JSON.parse(sessionStorage.getItem(currentUser)) || { bought: [], sold: [] };
-    const buyerData = JSON.parse(sessionStorage.getItem(toUser)) || { bought: [], sold: [] };
-
-    const totalBought = sellerData.bought
-        .filter((entry) => entry.stock === stock)
-        .reduce((sum, entry) => sum + parseInt(entry.quantity), 0);
-
-    const totalSold = sellerData.sold
-        .filter((entry) => entry.stock === stock)
-        .reduce((sum, entry) => sum + parseInt(entry.quantity), 0);
-
-    const available = totalBought - totalSold;
-
-    if (quantity > available) {
-        showPopup(`Cannot sell ${quantity} of ${stock}. You only have ${available} available.`);
+    // Validate inputs
+    if (!validateTradeInputs(price, quantity)) {
         return;
     }
 
+    // Calculate total cost
+    const totalCost = price * quantity;
+
+    // Check if buyer has enough balance
+    if (!canAffordPurchase(toUser, totalCost)) {
+        showPopup(`Cannot sell stocks. Buyer has insufficient funds.`, 'error');
+        return;
+    }
+
+    // Check if seller has enough stocks
+    const available = getAvailableStockQuantity(currentUser, stock);
+    if (quantity > available) {
+        showPopup(`Cannot sell ${quantity} of ${stock}. You only have ${available} available.`, 'error');
+        return;
+    }
+
+    // Confirm sale
+    if (!confirmAction(`Are you sure you want to sell ${quantity} of ${stock} to ${toUser} at ${formatCurrency(price)} each (total: ${formatCurrency(totalCost)})?`)) {
+        return;
+    }
+
+    // Get user data
+    const sellerData = getUserData(currentUser);
+    const buyerData = getUserData(toUser);
+
+    // Generate transaction ID
+    const transactionId = generateTransactionId();
+    const timestamp = new Date().toISOString();
+
     // Record in seller's sold list
-    sellerData.sold.push({ stock, price, quantity });
-    sessionStorage.setItem(currentUser, JSON.stringify(sellerData));
+    sellerData.sold.push({
+        stock,
+        price,
+        quantity,
+        buyer: toUser,
+        date: timestamp,
+        transactionId
+    });
 
     // Record in buyer's bought list
-    buyerData.bought.push({ stock, price, quantity });
-    sessionStorage.setItem(toUser, JSON.stringify(buyerData));
+    buyerData.bought.push({
+        stock,
+        price,
+        quantity,
+        seller: currentUser,
+        date: timestamp,
+        transactionId
+    });
 
-    showPopup(`Successfully sold ${quantity} of ${stock} to ${toUser} at AED${price}`);
+    // Save data
+    saveUserData(currentUser, sellerData);
+    saveUserData(toUser, buyerData);
+
+    // Show success message
+    showPopup(`Successfully sold ${quantity} of ${stock} to ${toUser} at ${formatCurrency(price)} each (total: ${formatCurrency(totalCost)})`, 'success');
+
+    // Update balance display
+    updateBalanceDisplay();
 }
 
-function logout() {
-    sessionStorage.removeItem("currentUser");
-    window.location.href = "login.html";
+// Validate trade inputs
+function validateTradeInputs(price, quantity) {
+    if (!isValidNumber(price)) {
+        showPopup("Please enter a valid price (must be greater than 0).", 'error');
+        return false;
+    }
+
+    if (!isValidNumber(quantity) || !Number.isInteger(quantity)) {
+        showPopup("Please enter a valid quantity (must be a positive integer).", 'error');
+        return false;
+    }
+
+    return true;
 }
 
-function showPopup(message) {
+// Generate a unique transaction ID
+function generateTransactionId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
+}
+
+// Update the balance display
+function updateBalanceDisplay() {
+    const currentUser = getUser();
+    if (currentUser) {
+        const balance = calculateBalance(currentUser);
+        const balanceElement = document.getElementById("balanceDisplay");
+        if (balanceElement) {
+            balanceElement.innerText = formatCurrency(balance);
+        }
+    }
+}
+
+// Show popup with type (success, error, warning)
+function showPopup(message, type = 'info') {
     const popup = document.getElementById("popupModal");
     const popupMessage = document.getElementById("popupMessage");
+    const popupContent = document.querySelector(".modal-content");
+
+    // Set message
     popupMessage.innerText = message;
+
+    // Set color based on type
+    popupContent.className = "modal-content";
+    popupContent.classList.add(`modal-${type}`);
+
+    // Show popup
     popup.style.display = "block";
+
+    // Auto-close after 5 seconds for success messages
+    if (type === 'success') {
+        setTimeout(() => {
+            closePopup();
+        }, 5000);
+    }
 }
 
+// Close popup
 function closePopup() {
     document.getElementById("popupModal").style.display = "none";
 }
 
+// Initialize page
 window.onload = () => {
-    const currentUser = sessionStorage.getItem("currentUser");
-    const userDiv = document.getElementById("userInfo");
-    if (!currentUser) {
-        window.location.href = "login.html";
+    // Check if user is logged in
+    if (!initPage()) {
         return;
     }
-    userDiv.innerText = `Logged in as: ${currentUser}`;
 
+    const currentUser = getUser();
+
+    // Populate sell to dropdown
     const sellToDropdown = document.getElementById("sellToUser");
     for (let i = 1; i <= 20; i++) {
         const id = `user${i}`;
@@ -94,4 +214,16 @@ window.onload = () => {
             sellToDropdown.add(option);
         }
     }
+
+    // Display current balance
+    updateBalanceDisplay();
+
+    // Add event listeners for input validation
+    document.getElementById("price").addEventListener("input", function() {
+        this.value = this.value.replace(/[^0-9.]/g, '');
+    });
+
+    document.getElementById("quantity").addEventListener("input", function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
 };
