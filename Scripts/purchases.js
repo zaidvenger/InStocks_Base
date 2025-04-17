@@ -18,6 +18,11 @@ function setPortfolioData(key, value) {
     sessionStorage.setItem(user, JSON.stringify(data));
 }
 
+function logout() {
+    sessionStorage.removeItem("currentUser");
+    window.location.href = "login.html";
+}
+
 function buyStock() {
     const stock = document.getElementById("stockSelect").value;
     const price = parseFloat(document.getElementById("price").value);
@@ -32,7 +37,7 @@ function buyStock() {
     bought.push({ stock, price, quantity });
     setPortfolioData("bought", bought);
 
-    showPopup(`Successfully bought ${quantity} of ${stock} at ₹${price}`);
+    showPopup(`Successfully bought ${quantity} of ${stock} at ${price}`);
 }
 
 function sellStock() {

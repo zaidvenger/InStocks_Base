@@ -1,17 +1,20 @@
 <!-- index.html -->
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Stock Market Simulation</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="container">
-    <h1>Welcome to the Stock Market Simulation</h1>
-    <div class="button-group">
-      <button onclick="window.location.href='portfolio.html'">View Portfolio</button>
-      <button onclick="window.location.href='purchases.html'">Buy/Sell Stocks</button>
-    </div>
-  </div>
-</body>
+    <head>
+        <title>Stock Market Simulation</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script src="Scripts/utils.js" defer></script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Welcome to the Stock Market Simulation</h1>
+            <div class="button-group">
+                <button onclick="window.location.href='portfolio.html'">View Portfolio</button>
+                <button onclick="window.location.href='purchases.html'">Buy/Sell Stocks</button>
+                <button onclick="window.location.href='leaderboard.html'">Leaderboard</button>
+            </div>
+            <button onclick="logout()">Log Out</button>
+        </div>
+    </body>
 </html>

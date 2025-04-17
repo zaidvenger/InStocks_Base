@@ -42,3 +42,8 @@ window.onload = function () {
     const cashInHand = initialCash - totalSpent + totalEarned;
     cashElement.innerText = `Cash in Hand: ₹${cashInHand}`;
 };
+
+function logout() {
+    sessionStorage.removeItem("currentUser");
+    window.location.href = "login.html";
+}
