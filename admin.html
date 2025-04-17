@@ -1,22 +1,24 @@
-<!-- leaderboard.html -->
+<!-- admin.html -->
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Leaderboard</title>
+        <title>Admin Panel</title>
         <link rel="stylesheet" href="styles.css" />
-        <script src="Scripts/leaderboard.js" defer></script>
+        <script src="Scripts/admin.js" defer></script>
         <script src="Scripts/utils.js" defer></script>
     </head>
     <body>
         <div class="container">
-            <h1>Leaderboard</h1>
+            <h1>Admin Panel</h1>
             <div id="userInfo"></div>
-            <table id="leaderboardTable">
+            <table id="adminTable">
                 <tr>
                     <th>User</th>
                     <th>Balance</th>
+                    <th>Action</th>
                 </tr>
             </table>
+            <button onclick="resetAllUsers()">Reset All</button>
             <button onclick="window.location.href='index.html'">Back to Home</button>
             <button onclick="logout()">Logout</button>
         </div>

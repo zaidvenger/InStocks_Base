@@ -8,6 +8,9 @@ function calculateBalance(user) {
     return 100000 - totalSpent + totalEarned;
 }
 
+const user = sessionStorage.getItem("currentUser");
+if (!user) window.location.href = "login.html";
+else document.getElementById("userInfo").innerText = `Logged in as: ${user}`;
 function logout() {
     sessionStorage.removeItem("currentUser");
     window.location.href = "login.html";

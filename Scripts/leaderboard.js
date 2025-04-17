@@ -1,6 +1,13 @@
 // leaderboard.js
 
 window.onload = function () {
+    const currentUser = sessionStorage.getItem("currentUser");
+    if (!currentUser) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    document.getElementById("userInfo").innerText = `Logged in as: ${currentUser}`;
     const table = document.getElementById("leaderboardTable");
     const users = [];
 
@@ -14,10 +21,7 @@ window.onload = function () {
 
     users.forEach(({ userId, balance }) => {
         const row = table.insertRow();
-        row.innerHTML = `
-        <td>${userId}</td>
-        <td>${balance}</td>
-      `;
+        row.innerHTML = `<td>${userId}</td><td>AED${balance}</td>`;
     });
 };
 
